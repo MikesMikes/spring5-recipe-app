@@ -120,14 +120,16 @@ public class RecipeBootstrap implements ApplicationListener<ContextRefreshedEven
         perfectGuacNotes.setRecipe(perfectGuacRecipe);
         perfectGuacRecipe.setNotes(perfectGuacNotes);
 
-        perfectGuacRecipe.getIngredient().add(new Ingredient(perfectGuacRecipe, "Avocado", eachUom, new BigDecimal(2)));
-        perfectGuacRecipe.getIngredient().add(new Ingredient(perfectGuacRecipe, "Salt", tspUom, new BigDecimal(0.5)));
-        perfectGuacRecipe.getIngredient().add(new Ingredient(perfectGuacRecipe, "lime or lemon juice", tbspUom, new BigDecimal(1)));
-        perfectGuacRecipe.getIngredient().add(new Ingredient(perfectGuacRecipe, "diced red onion", tbspUom, new BigDecimal(2)));
-        perfectGuacRecipe.getIngredient().add(new Ingredient(perfectGuacRecipe, "serrano (or jalapeño) chilis, stems and seeds removed, minced", eachUom, new BigDecimal(1)));
-        perfectGuacRecipe.getIngredient().add(new Ingredient(perfectGuacRecipe, "cilantro (leaves and tender stems), finely chopped", tbspUom, new BigDecimal(2)));
-        perfectGuacRecipe.getIngredient().add(new Ingredient(perfectGuacRecipe, "Pepper", pinchUom, new BigDecimal(1)));
-        perfectGuacRecipe.getIngredient().add(new Ingredient(perfectGuacRecipe, "ripe tomato, chopped (optional)", tspUom, new BigDecimal(1)));
+        perfectGuacRecipe.addIngredient(new Ingredient(perfectGuacRecipe, "Avocado", eachUom, new BigDecimal(2)));
+        perfectGuacRecipe.addIngredient(new Ingredient(perfectGuacRecipe, "Salt", tspUom, new BigDecimal(0.5)));
+        perfectGuacRecipe.addIngredient(new Ingredient(perfectGuacRecipe, "lime or lemon juice", tbspUom, new BigDecimal(1)));
+        perfectGuacRecipe.addIngredient(new Ingredient(perfectGuacRecipe, "diced red onion", tbspUom, new BigDecimal(2)));
+        perfectGuacRecipe.addIngredient(new Ingredient(perfectGuacRecipe, "serrano (or jalapeño) chilis, stems and seeds removed, minced", eachUom, new BigDecimal(1)));
+        perfectGuacRecipe.addIngredient(new Ingredient(perfectGuacRecipe, "cilantro (leaves and tender stems), finely chopped", tbspUom, new BigDecimal(2)));
+        perfectGuacRecipe.addIngredient(new Ingredient(perfectGuacRecipe, "Pepper", pinchUom, new BigDecimal(1)));
+        perfectGuacRecipe.addIngredient(new Ingredient(perfectGuacRecipe, "ripe tomato, chopped (optional)", tspUom, new BigDecimal(1)));
+
+
 
         perfectGuacRecipe.getCategories().add(americanCategory);
         perfectGuacRecipe.getCategories().add(mexicanCategory);
