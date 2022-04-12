@@ -52,4 +52,12 @@ public class Recipe {
         this.ingredients.add(ingredient);
         return this;
     }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
 }
