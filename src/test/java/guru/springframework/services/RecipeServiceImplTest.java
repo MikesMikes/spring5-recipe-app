@@ -60,5 +60,10 @@ public class RecipeServiceImplTest extends TestCase {
 
     }
 
+    public void testDeleteById() {
+        Long idToDelete = 1L;
+        recipeService.deleteById(idToDelete);
 
+        verify(recipeRepository, times(1)).deleteById(anyLong());
+    }
 }
