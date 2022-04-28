@@ -18,4 +18,11 @@ public class UnitOfMeasure {
     private Long id;
     private String description;
 
+    @Override
+    public String toString() {
+        return "UnitOfMeasure{" +
+                "id=" + id +
+                ", description='" + description + '\'' +
+                '}';
+    }
 }

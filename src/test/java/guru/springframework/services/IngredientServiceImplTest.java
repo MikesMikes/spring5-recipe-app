@@ -3,6 +3,7 @@ package guru.springframework.services;
 import guru.springframework.commands.IngredientCommand;
 import guru.springframework.converters.IngredientCommandToIngredient;
 import guru.springframework.converters.IngredientToIngredientCommand;
+import guru.springframework.converters.UnitOfMeasureCommandToUnitOfMeasure;
 import guru.springframework.converters.UnitOfMeasureToUnitOfMeasureCommand;
 import guru.springframework.domain.Ingredient;
 import guru.springframework.domain.Recipe;
@@ -24,10 +25,10 @@ import static org.mockito.Mockito.*;
 public class IngredientServiceImplTest {
 
     private final IngredientToIngredientCommand ingredientToIngredientCommand;
-
     private final IngredientCommandToIngredient ingredientCommandToIngredient;
 
-    private final UnitOfMeasureRepository uomRepository;
+    @Mock
+    UnitOfMeasureRepository uomRepository;
 
     @Mock
     RecipeRepository recipeRepository;
@@ -35,9 +36,8 @@ public class IngredientServiceImplTest {
     IngredientService ingredientService;
 
     //init converters
-    public IngredientServiceImplTest(IngredientCommandToIngredient ingredientCommandToIngredient, UnitOfMeasureRepository uomRepository) {
-        this.ingredientCommandToIngredient = ingredientCommandToIngredient;
-        this.uomRepository = uomRepository;
+    public IngredientServiceImplTest(){
+        this.ingredientCommandToIngredient = new IngredientCommandToIngredient(new UnitOfMeasureCommandToUnitOfMeasure());
         this.ingredientToIngredientCommand = new IngredientToIngredientCommand(new UnitOfMeasureToUnitOfMeasureCommand());
     }
 
@@ -51,6 +51,7 @@ public class IngredientServiceImplTest {
     @Test
     public void findByRecipeIdAndId() throws Exception {
     }
+
 
     @Test
     void findByRecipeIdAndIngredientId() {
