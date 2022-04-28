@@ -1,6 +1,8 @@
 package guru.springframework.controllers;
 
 import guru.springframework.commands.IngredientCommand;
+import guru.springframework.commands.RecipeCommand;
+import guru.springframework.commands.UnitOfMeasureCommand;
 import guru.springframework.services.IngredientService;
 import guru.springframework.services.RecipeService;
 import guru.springframework.services.UnitOfMeasureService;
@@ -52,6 +54,8 @@ public class IngredientController {
 
     @PostMapping("/recipe/{recipeId}/ingredient")
     public String saveOrUpdate(@ModelAttribute IngredientCommand ingredientCommand) {
+        log.info("IngredientController::saveOrUpdate ");
+        log.info("IngredientController::saveOrUpdate - IngredientCommand: " + ingredientCommand.toString());
 
         IngredientCommand saveIngredientCommand = ingredientService.saveIngredientCommand(ingredientCommand);
 
@@ -59,5 +63,33 @@ public class IngredientController {
         log.debug("IngredientController::saveOrUpdate - ingredientId : " + saveIngredientCommand.getId());
 
         return "redirect:/recipe/" + saveIngredientCommand.getRecipeId() + "/ingredient/" + saveIngredientCommand.getId() + "/show";
+    }
+
+
+    /**
+     *working
+     * need to fix IngredientServiceImpl::saveIngredientCommand to save newIngredient as POST
+     *ingredientform makes a post to /recipe/{recipeId}/ingredient which fetches IngredientController::saveOrUpdate
+     */
+    @GetMapping
+    @RequestMapping("/recipe/{recipeId}/ingredient/new")
+    public String newIngredient(@PathVariable String recipeId, Model model){
+        log.info("@IngredientController::newIngredient");
+
+        //check if ID is proper todo raise except if null
+        RecipeCommand recipeCommand = recipeService.findRecipeCommandById((Long.valueOf(recipeId)));
+        log.info("IngredientController::newIngredient - Ingredient.getRecipe.id.isPresent - new Ingredient's recipeId: " + recipeCommand.getId());
+
+        IngredientCommand ingredientCommand = new IngredientCommand();
+        ingredientCommand.setRecipeId(Long.valueOf(recipeId));
+        model.addAttribute("ingredient", ingredientCommand);
+
+        ingredientCommand.setUnitOfMeasure(new UnitOfMeasureCommand());
+
+        model.addAttribute("uomList", unitOfMeasureService.listAllUomsAsCommand());
+
+        log.info("IngredientController::newIngredient - ingredientCommand - " + ingredientCommand.toString());
+
+        return "recipe/ingredient/ingredientform";
     }
 }

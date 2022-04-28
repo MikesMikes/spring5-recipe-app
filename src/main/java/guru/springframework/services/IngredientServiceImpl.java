@@ -9,6 +9,7 @@ import guru.springframework.repositories.RecipeRepository;
 import guru.springframework.repositories.UnitOfMeasureRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -33,6 +34,8 @@ public class IngredientServiceImpl implements IngredientService {
     @Override
     public IngredientCommand findByRecipeIdAndIngredientId(Long recipeId, Long ingredientId) {
 
+        log.info("@IngredientServiceImpl::findByRecipeIdAndIngredientId ");
+
         Optional<Recipe> recipeOptional = recipeRepository.findById(recipeId);
 
         if (!recipeOptional.isPresent()) {
@@ -56,43 +59,110 @@ public class IngredientServiceImpl implements IngredientService {
         return ingredientCommandOptional.get();
     }
 
+    @Transactional
     @Override
     public IngredientCommand saveIngredientCommand(IngredientCommand ingredientCommand) {
+        log.info("@IngredientServiceImpl::saveIngredientCommand");
 
         Optional<Recipe> recipeOptional = recipeRepository.findById(ingredientCommand.getRecipeId());
-        log.info("IngredientService:: saveIngredientCommand :: recipeRepository.findById - isPresent: " + recipeOptional.isPresent());
 
         if (!recipeOptional.isPresent()){
-            log.error("IngredientService:: saveIngredientCommand - ingredient's recipe not found!");
+            log.error("IngredientServiceImpl::saveIngredientCommand - ingredient's recipe not found!");
             return new IngredientCommand();
         } else {
             Recipe recipe = recipeOptional.get();
-            log.info("IngredientService:: saveIngredientCommand - recipe found!");
+            log.info("IngredientServiceImpl::saveIngredientCommand:: recipeRepository.findById - isPresent: " + recipeOptional.isPresent());
             Optional<Ingredient> ingredientOptional = recipe.getIngredients()
                     .stream()
                     .filter(ingredient -> ingredient.getId().equals(ingredientCommand.getId()))
                     .findFirst();
 
             if(ingredientOptional.isPresent()){
+                log.info("IngredientServiceImpl::saveIngredientCommand - ingredient.isPresent: " + ingredientOptional.get().toString());
                 Ingredient ingredientFound = ingredientOptional.get();
                 ingredientFound.setDescription(ingredientCommand.getDescription());
                 ingredientFound.setAmount(ingredientCommand.getAmount());
-                log.info("saveIngredientCommand: Ingredient Optional UOM : " + ingredientFound.getUnitOfMeasure().toString());
-                log.error("saveIngredientCommand: ingredientCommand UOM: " + ingredientCommand.getUnitOfMeasure().toString()); //Ingredient Command UOM error
+                log.info("IngredientServiceImpl::saveIngredientCommand - Ingredient Optional UOM : " + ingredientFound.getUnitOfMeasure().toString());
+                log.error("IngredientServiceImpl::saveIngredientCommand - ingredientCommand UOM: " + ingredientCommand.getUnitOfMeasure().toString()); //Ingredient Command UOM error
                 ingredientFound.setUnitOfMeasure(unitOfMeasureRepository
                         .findById(ingredientCommand.getUnitOfMeasure().getId())
                         .orElseThrow(() -> new RuntimeException("UOM NOT FOUND"))); //todo address this
             } else {
-                recipe.addIngredient(ingredientCommandToIngredient.convert(ingredientCommand));
-                log.info("IngredientService:: saveIngredientCommand - ingredient added : id " + ingredientCommand.getId());
+                //new ingredient
+                log.info("IngredientServiceImpl::saveIngredientCommand - Creating new ingredient");
+                Ingredient ingredient = ingredientCommandToIngredient.convert(ingredientCommand);
+                //todo broken after convertion
+                log.info("IngredientServiceImpl::saveIngredientCommand - Ingredient converted: " + ingredient.toString());
+                ingredient.setRecipe(recipe);
+                log.info("IngredientServiceImpl::saveIngredientCommand - Ingredient recipeId: " + ingredient.getRecipe().getId());
+                recipe.addIngredient(ingredient);
+                log.info("IngredientService:: saveIngredientCommand - new ingredient added : " + ingredient.toString() );
             }
+
+            log.info("IngredientServiceImpl::saveIngredientCommand - saving to recipe repository");
+
             Recipe savedRecipe = recipeRepository.save(recipe);
 
-            return ingredientToIngredientCommand.convert(savedRecipe.getIngredients()
+            Optional<Ingredient> saveIngredientOptional = savedRecipe.getIngredients()
                     .stream()
-                    .filter(ingredient -> ingredient.getId().equals(ingredientCommand.getId()))
-                        .findFirst()
-                        .get());
+                    .filter(ingredient -> ingredient.getDescription().equals(ingredientCommand.getDescription()))
+                    .filter(ingredient -> ingredient.getAmount().equals(ingredientCommand.getAmount()))
+                    .filter(ingredient -> ingredient.getUnitOfMeasure().getId().equals(ingredientCommand.getUnitOfMeasure().getId()))
+                    .findFirst();
+
+            //todo no value present
+            return ingredientToIngredientCommand.convert(saveIngredientOptional.get());
         }
+
+//    @Override
+//    public IngredientCommand saveIngredientCommand(IngredientCommand ingredientCommand) {
+//        log.info("@IngredientServiceImpl::saveIngredientCommand");
+//
+//        Optional<Recipe> recipeOptional = recipeRepository.findById(ingredientCommand.getRecipeId());
+//
+//        if (!recipeOptional.isPresent()){
+//            log.error("IngredientServiceImpl::saveIngredientCommand - ingredient's recipe not found!");
+//            return new IngredientCommand();
+//        } else {
+//            Recipe recipe = recipeOptional.get();
+//            log.info("IngredientServiceImpl::saveIngredientCommand:: recipeRepository.findById - isPresent: " + recipeOptional.isPresent());
+//            Optional<Ingredient> ingredientOptional = recipe.getIngredients()
+//                    .stream()
+//                    .filter(ingredient -> ingredient.getId().equals(ingredientCommand.getId()))
+//                    .findFirst();
+//
+//            if(ingredientOptional.isPresent()){
+//                log.info("IngredientServiceImpl::saveIngredientCommand - ingredient.isPresent: " + ingredientOptional.get().toString());
+//                Ingredient ingredientFound = ingredientOptional.get();
+//                ingredientFound.setDescription(ingredientCommand.getDescription());
+//                ingredientFound.setAmount(ingredientCommand.getAmount());
+//                log.info("IngredientServiceImpl::saveIngredientCommand - Ingredient Optional UOM : " + ingredientFound.getUnitOfMeasure().toString());
+//                log.error("IngredientServiceImpl::saveIngredientCommand - ingredientCommand UOM: " + ingredientCommand.getUnitOfMeasure().toString()); //Ingredient Command UOM error
+//                ingredientFound.setUnitOfMeasure(unitOfMeasureRepository
+//                        .findById(ingredientCommand.getUnitOfMeasure().getId())
+//                        .orElseThrow(() -> new RuntimeException("UOM NOT FOUND"))); //todo address this
+//            } else {
+//                //new ingredient
+//                log.info("IngredientServiceImpl::saveIngredientCommand - Creating new ingredient");
+//                Ingredient ingredient = ingredientCommandToIngredient.convert(ingredientCommand);
+//                //todo broken after convertion
+//                log.info("IngredientServiceImpl::saveIngredientCommand - Ingredient converted: " + ingredient.toString());
+//                ingredient.setRecipe(recipe);
+//                log.info("IngredientServiceImpl::saveIngredientCommand - Ingredient recipeId: " + ingredient.getRecipe().getId());
+//                recipe.addIngredient(ingredient);
+//                log.info("IngredientService:: saveIngredientCommand - new ingredient added : " + ingredient.toString() );
+//            }
+//
+//            log.info("IngredientServiceImpl::saveIngredientCommand - saving to recipe repository");
+//
+//            Recipe savedRecipe = recipeRepository.save(recipe);
+//
+//            Optional<Ingredient> saveIngredientOptional = savedRecipe.getIngredients()
+//                    .stream()
+//                    .filter(recipeIngredients -> recipeIngredients.getId().equals(ingredientCommand.getId()))
+//                    .findFirst();
+//
+//            return ingredientToIngredientCommand.convert(saveIngredientOptional.get());
+//        }
     }
 }

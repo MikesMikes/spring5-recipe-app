@@ -33,7 +33,7 @@ public class IngredientCommandToIngredient implements Converter<IngredientComman
         ingredient.setId(ingredientCommand.getId());
 
         if (ingredientCommand.getRecipeId() != null) {
-            log.info("ngredientCommandToIngredient:: convert - recipeId found: " + ingredientCommand.getRecipeId());
+            log.info("IngredientCommandToIngredient::convert - recipeId " + ingredientCommand.getRecipeId());
             Recipe recipe = new Recipe();
             recipe.setId(ingredientCommand.getRecipeId());
             ingredient.setRecipe(recipe);
@@ -42,8 +42,13 @@ public class IngredientCommandToIngredient implements Converter<IngredientComman
 
 
         ingredient.setAmount(ingredientCommand.getAmount());
+        log.info("IngredientCommandToIngredient::convert - ingredient amount: " + ingredientCommand.getAmount());
         ingredient.setDescription(ingredientCommand.getDescription());
+        log.info("IngredientCommandToIngredient::convert - ingredient description: " + ingredientCommand.getAmount());
         ingredient.setUnitOfMeasure(unitOfMeasureCommandToUnitOfMeasure.convert(ingredientCommand.getUnitOfMeasure()));
+        log.info("IngredientCommandToIngredient::convert - ingredient UOM: " + ingredientCommand.getUnitOfMeasure().toString());
+
+        log.info("IngredientCommandToIngredient::convert - done");
 
         return ingredient;
     }
