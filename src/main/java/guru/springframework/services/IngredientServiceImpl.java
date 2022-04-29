@@ -103,7 +103,6 @@ public class IngredientServiceImpl implements IngredientService {
 
             Recipe savedRecipe = recipeRepository.save(recipe);
 
-            //todo find how hes finding command id here
             Optional<Ingredient> saveIngredientOptional = savedRecipe.getIngredients()
                     .stream().filter(ingredient -> ingredient.getId().equals(ingredientCommand.getId())).findFirst();
 
@@ -125,5 +124,32 @@ public class IngredientServiceImpl implements IngredientService {
             //todo no value present
             return ingredientToIngredientCommand.convert(saveIngredientOptional.get());
         }
+    }
+
+    public void deleteIngredientById(Long recipeId, Long ingredientId) {
+        log.info("IngredientService::deleteIngredientById");
+        Optional<Recipe> recipeReturned = recipeRepository.findById(recipeId);
+
+        Recipe recipe = new Recipe();
+
+        if (recipeReturned.isPresent()) {
+            recipe = recipeReturned.get();
+            log.info("IngredientService::deleteIngredientById - Recipe Found");
+            log.info("IngredientService::deleteIngredientById - Recipe Ingredients Size: " + recipe.getIngredients().size());
+
+            Optional<Ingredient> ingredientOptional = recipe.getIngredients()
+                    .stream()
+                    .filter(ingredient1 -> ingredient1.getId().equals(ingredientId))
+                    .findFirst();
+
+            if (ingredientOptional.isPresent()){
+                log.info("IngredientService::deleteIngredientById - Ingredient is present: " + ingredientOptional.toString());
+                Ingredient ingredientDeleted = ingredientOptional.get();
+                ingredientDeleted.setRecipe(null);
+                recipe.getIngredients().remove(ingredientDeleted);
+            }
+        }
+        log.info("IngredientService::deleteIngredientById - Saving Recipe - IngredientSize: " + recipe.getIngredients().size());
+        recipeRepository.save(recipe);
     }
 }
