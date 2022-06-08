@@ -89,7 +89,6 @@ public class IngredientController {
         model.addAttribute("uomList", unitOfMeasureService.listAllUomsAsCommand());
 
         log.info("IngredientController::newIngredient - ingredientCommand - " + ingredientCommand.toString());
-
         return "recipe/ingredient/ingredientform";
     }
 
