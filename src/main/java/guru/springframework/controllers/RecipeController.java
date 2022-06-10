@@ -68,11 +68,12 @@ public class RecipeController {
         log.info("handleNotFound - ");
         log.error(exception.getMessage());
 
-        ModelAndView modelAndView = new ModelAndView("404error");
+        ModelAndView modelAndView = new ModelAndView("errors/404error");
         modelAndView.addObject("error", exception);
 
         return modelAndView;
     }
+
 
 
 }

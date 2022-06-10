@@ -32,7 +32,9 @@ class RecipeControllerTest {
     void setUp() {
         MockitoAnnotations.initMocks(this);
         recipeController = new RecipeController(recipeService);
-        mockMvc = MockMvcBuilders.standaloneSetup(recipeController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(recipeController)
+                .setControllerAdvice(new ControllerExceptionHandler())
+                .build();
     }
 
     @Test
@@ -67,6 +69,14 @@ class RecipeControllerTest {
         mockMvc.perform(get("/recipe/4/show"))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    void testNumberFormetException() throws Exception {
+        mockMvc.perform(get("/recipe/asd/show"))
+                .andExpect(status().is4xxClientError());
+    }
+
+
 
     @Test
     void testPostNewRecipeForm() throws Exception {
