@@ -61,6 +61,7 @@ class RecipeControllerTest {
                 .andExpect(model().attributeExists("recipe"));
     }
 
+
     @Test
     void testGetRecipeNotFound() throws Exception {
 
@@ -71,7 +72,7 @@ class RecipeControllerTest {
     }
 
     @Test
-    void testNumberFormetException() throws Exception {
+    void testNumberFormException() throws Exception {
         mockMvc.perform(get("/recipe/asd/show"))
                 .andExpect(status().is4xxClientError());
     }
@@ -86,9 +87,33 @@ class RecipeControllerTest {
         when(recipeService.saveRecipeCommand(any())).thenReturn(recipeCommand);
 
         mockMvc.perform(post("/recipe")
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED))
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .param("id", "")
+                        .param("description", "some description")
+                        .param("directions", "some directions"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/recipe/2/show"));
+    }
+
+    /**
+     * createOrUpdate does not proceed to redirect
+     * @throws Exception
+     */
+    @Test
+    void testPostNewRecipeValidationFail() throws Exception {
+        RecipeCommand command = new RecipeCommand();
+        command.setId(2L);
+
+        when(recipeService.saveRecipeCommand(any())).thenReturn(command);
+
+        mockMvc.perform(post("/recipe")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .param("id", "")
+
+                )
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("recipe"))
+                .andExpect(view().name("recipe/recipeform"));
     }
 
     @Test
